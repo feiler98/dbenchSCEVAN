@@ -1,5 +1,6 @@
 FROM scevan_pyomics
-RUN yum update -y
+
+COPY . .
 
 RUN yum install -y pip
 RUN yum install -y python3-devel
