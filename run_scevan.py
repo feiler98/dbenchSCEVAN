@@ -38,6 +38,7 @@ def val_build_project() -> (Path, Path):
 def get_hg_38_file_paths(target_path: Path) -> list:
     return [p for p in target_path.rglob("*__hg_38__RCM.csv") if p.is_file()]
 
+
 # add decorator for performance
 def run_scevan(path_target: Path,
                 path_out_data: Path,
