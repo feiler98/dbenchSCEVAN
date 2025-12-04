@@ -1,0 +1,5 @@
+git rm --cached data_input
+git rm --cached .idea
+
+data_input
+.idea
