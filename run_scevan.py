@@ -1,4 +1,5 @@
 # running scevan
+# contains EnsDb.Hsapiens.v86 which correlates to hg 38
 
 # imports
 # ----------------------------------------------------------------------------------------------------------------------
