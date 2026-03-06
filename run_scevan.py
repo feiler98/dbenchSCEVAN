@@ -39,6 +39,7 @@ def val_build_project() -> (Path, Path):
 def get_hg_38_file_paths(target_path: Path) -> list:
     return list(target_path.rglob("*__hg_38__RCM.csv"))
 
+
 def get_hg_38_desc_paths(target_path: Path) -> dict:
     return {p.stem: p for p in target_path.rglob("*__hg_38__RCM.txt")}
 
