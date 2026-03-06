@@ -37,39 +37,52 @@ def val_build_project() -> (Path, Path):
 
 
 def get_hg_38_file_paths(target_path: Path) -> list:
-    return [p for p in target_path.rglob("*__hg_38__RCM.csv") if p.is_file()]
+    return list(target_path.rglob("*__hg_38__RCM.csv"))
+
+def get_hg_38_desc_paths(target_path: Path) -> dict:
+    return {p.stem: p for p in target_path.rglob("*__hg_38__RCM.txt")}
 
 
 # add decorator for performance
 def run_scevan(path_target: Path,
                 path_out_data: Path,
-                norm_cell_list: robjects = robjects.NULL,
                 n_cores: int = 10,
                 n_genes_chr: int = 5,
                 perc_genes: int = 10,
-                beta_vega: float = 0.5):
+                beta_vega: float = 0.5,
+                cell_pre_label: bool = False):
     list_paths_target_csvs = get_hg_38_file_paths(path_target)
+    if cell_pre_label:
+        dict_paths_target_txts = get_hg_38_desc_paths(path_target)
+        list_paths_target_csvs = [p for p in list_paths_target_csvs if p.stem in dict_paths_target_txts.keys()]
     for p in list_paths_target_csvs:
-        name_tag = f"{p.stem}__c{n_cores}ngc{n_genes_chr}pg{perc_genes}bv{beta_vega}__scevan_"
+        name_tag = f"{p.stem}__c{n_cores}ngc{n_genes_chr}pg{perc_genes}bv{beta_vega}cpl{cell_pre_label}__scevan_"
         path_out_target = path_out_data / f"out__{name_tag}"
         path_out_target.mkdir(parents=True, exist_ok=True)
+
+        norm_cell_vector = robjects.NULL
+        if cell_pre_label:
+            path_txt = dict_paths_target_txts[p.stem]   # normal cells split by \n
+            with open(path_txt, "r") as f:
+                list_norm_cells = list(map(lambda x: x.replace("\n", ""), f.readlines()))
+                norm_cell_vector = robjects.vectors.StrVector(list_norm_cells)
 
         @benchmark_method(str(path_out_target))
         def run_rscript(p,
                         name_tag,
                         n_cores,
-                        norm_cell_list,
+                        norm_cell_vector,
                         n_genes_chr,
                         perc_genes,
                         beta_vega):
             r = robjects.r
             r.source("c_scevanR.R")
-            r.r_run_scevan(str(p), name_tag, n_cores, norm_cell_list, n_genes_chr, perc_genes, beta_vega)
+            r.r_run_scevan(str(p), name_tag, n_cores, norm_cell_vector, n_genes_chr, perc_genes, beta_vega)
 
         run_rscript(p,
                     name_tag,
                     n_cores,
-                    norm_cell_list,
+                    norm_cell_vector,
                     n_genes_chr,
                     perc_genes,
                     beta_vega)
@@ -95,7 +108,8 @@ if __name__ == "__main__":
         "n_cores": [10],
         "n_genes_chr": [5],
         "perc_genes": [0, 5, 10, 20, 30],
-        "beta_vega": [0.1, 0.5, 1, 2, 3, 4]
+        "beta_vega": [0.1, 0.5, 1, 2, 3, 4],
+        "cell_pre_label": [True, False]
     }
 
     path_in, path_out = val_build_project()
