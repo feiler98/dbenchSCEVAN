@@ -41,7 +41,7 @@ def get_hg_38_file_paths(target_path: Path) -> list:
 
 
 def get_hg_38_desc_paths(target_path: Path) -> dict:
-    return {p.stem: p for p in target_path.rglob("*__hg_38__RCM.txt")}
+    return {p.stem: p for p in target_path.rglob("*__hg_38.txt")}
 
 
 # add decorator for performance
@@ -55,15 +55,15 @@ def run_scevan(path_target: Path,
     list_paths_target_csvs = get_hg_38_file_paths(path_target)
     if cell_pre_label:
         dict_paths_target_txts = get_hg_38_desc_paths(path_target)
-        list_paths_target_csvs = [p for p in list_paths_target_csvs if p.stem in dict_paths_target_txts.keys()]
+        list_paths_target_csvs = [p for p in list_paths_target_csvs if p.stem.split("__RCM")[0] in dict_paths_target_txts.keys()]
     for p in list_paths_target_csvs:
-        name_tag = f"{p.stem}__c{n_cores}ngc{n_genes_chr}pg{perc_genes}bv{beta_vega}cpl{cell_pre_label}__scevan_"
+        name_tag = f"{p.stem}__n_cores,{n_cores};n_genes_chr,{n_genes_chr};perc_genes,{perc_genes};beta_vega,{beta_vega};cell_pre_label,{cell_pre_label}__scevan_"
         path_out_target = path_out_data / f"out__{name_tag}"
         path_out_target.mkdir(parents=True, exist_ok=True)
 
         norm_cell_vector = robjects.NULL
         if cell_pre_label:
-            path_txt = dict_paths_target_txts[p.stem]   # normal cells split by \n
+            path_txt = dict_paths_target_txts[p.stem.split("__RCM")[0]]   # normal cells split by \n
             with open(path_txt, "r") as f:
                 list_norm_cells = list(map(lambda x: x.replace("\n", ""), f.readlines()))
                 norm_cell_vector = robjects.vectors.StrVector(list_norm_cells)
@@ -106,8 +106,8 @@ if __name__ == "__main__":
     # matrix of possible scevan hyperparameter kwargs
     # 0 for beta_vega not allowed (comparable to copykat's KS.cut)
     kwargs_gridsearch = {
-        "n_cores": [10],
-        "n_genes_chr": [5],
+        "n_cores": [5, 10, 20],
+        "n_genes_chr": [1, 5, 10, 100],
         "perc_genes": [0, 5, 10, 20, 30],
         "beta_vega": [0.1, 0.5, 1, 2, 3, 4],
         "cell_pre_label": [True, False]
