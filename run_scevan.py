@@ -114,12 +114,12 @@ if __name__ == "__main__":
     }
 
     path_in, path_out = val_build_project()
-    run_scevan(path_in, path_out, n_cores=1)  # standard parameters; one core
+    run_scevan(path_in, path_out, n_cores=10, cell_pre_label=True)  # standard parameters; one core
     list_kwargs = grid_by_dict(kwargs_gridsearch)
 
-    for kwarg_opt in list_kwargs:
-        print(f"SCEVAN running with hyperparameters: {kwarg_opt}")
-        run_scevan(path_in, path_out, **kwarg_opt)
+    #for kwarg_opt in list_kwargs:
+    #    print(f"SCEVAN running with hyperparameters: {kwarg_opt}")
+    #    run_scevan(path_in, path_out, **kwarg_opt)
 
 
 
