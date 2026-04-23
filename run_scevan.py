@@ -57,7 +57,7 @@ def run_scevan(path_target: Path,
         dict_paths_target_txts = get_hg_38_desc_paths(path_target)
         list_paths_target_csvs = [p for p in list_paths_target_csvs if p.stem.split("__RCM")[0] in dict_paths_target_txts.keys()]
     for p in list_paths_target_csvs:
-        name_tag = f"{p.stem}__n_cores,{n_cores};n_genes_chr,{n_genes_chr};perc_genes,{perc_genes};beta_vega,{beta_vega};cell_pre_label,{cell_pre_label}__scevan_"
+        name_tag = f"{p.stem}__n,{n_cores};n,{n_genes_chr};p,{perc_genes};b,{beta_vega};c,{cell_pre_label}__scevan_"
         path_out_target = path_out_data / f"out__{name_tag}"
         path_out_target.mkdir(parents=True, exist_ok=True)
 
