@@ -93,7 +93,9 @@ def run_scevan(path_target: Path,
         df_cnv = rdata.read_rds(path_cnv_rdata)["CNA_mtx_relat"].to_pandas()
         path_annot_rdata = [p for p in Path("./output").glob("*__scevan__count_mtx_annot.RData")][0]
         df_pos = rdata.read_rds(path_annot_rdata)['count_mtx_annot'].set_index("gene_name").drop("gene_id", axis=1).rename({"seqnames":"CHR", "start":"START", "end":"END"}, axis=1).astype(int)
-        df_concat = pd.concat([df_pos, df_cnv], axis=1).set_index("CHR")
+        df_concat = pd.concat([df_pos, df_cnv], axis=1)
+        df_concat["CHR"] = df_concat["CHR"].map(lambda x: f"chr{x}")
+        df_concat.set_index("CHR")
         df_concat.to_csv(Path.cwd() / f"{name_tag}_GBC.csv")
 
         list_all_nametag_items = [p for p in Path.cwd().glob(f"*{name_tag}*")]
