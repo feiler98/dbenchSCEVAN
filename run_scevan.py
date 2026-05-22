@@ -10,8 +10,22 @@ import shutil
 import pandas as pd
 from pyomics.utils import benchmark_method
 import itertools
+import random
+import string
 # ----------------------------------------------------------------------------------------------------------------------
 
+def random_sequence(len_seq: int) -> str:
+    list_signs = []
+    list_signs.extend(list(string.ascii_lowercase))
+    list_signs.extend(list(string.ascii_uppercase))
+    list_signs.extend(list(range(0, 10, 1)))
+    random.shuffle(list_signs)
+    i = 1
+    rand_seq = []
+    while i <= len_seq:
+        rand_seq.append(str(list_signs[random.randint(0, len(list_signs)-1)]))
+        i+=1
+    return "".join(rand_seq)
 
 def grid_by_dict(pars_dict: dict) -> list:
     keys=pars_dict.keys()
@@ -57,8 +71,8 @@ def run_scevan(path_target: Path,
         dict_paths_target_txts = get_hg_38_desc_paths(path_target)
         list_paths_target_csvs = [p for p in list_paths_target_csvs if p.stem.split("__RCM")[0] in dict_paths_target_txts.keys()]
     for p in list_paths_target_csvs:
-        name_tag = f"{p.stem}__n,{n_cores};n,{n_genes_chr};p,{perc_genes};b,{beta_vega};c,{cell_pre_label}__scevan_"
-        path_out_target = path_out_data / f"out__{name_tag}"
+        name_tag = f"{p.stem}__{random_sequence(len_seq=8)}__scevan"
+        path_out_target = path_out_data / name_tag
         path_out_target.mkdir(parents=True, exist_ok=True)
 
         norm_cell_vector = robjects.NULL
@@ -89,9 +103,9 @@ def run_scevan(path_target: Path,
                     beta_vega)
 
         # generate a csv-matrix for the CNA-output
-        path_cnv_rdata = [p for p in Path("./output").glob("*__scevan__CNAmtx.RData")][0]
+        path_cnv_rdata = [p for p in Path("./output").glob("*__scevan_CNAmtx.RData")][0]
         df_cnv = rdata.read_rds(path_cnv_rdata)["CNA_mtx_relat"].to_pandas()
-        path_annot_rdata = [p for p in Path("./output").glob("*__scevan__count_mtx_annot.RData")][0]
+        path_annot_rdata = [p for p in Path("./output").glob("*__scevan_count_mtx_annot.RData")][0]
         df_pos = rdata.read_rds(path_annot_rdata)['count_mtx_annot'].set_index("gene_name").drop("gene_id", axis=1).rename({"seqnames":"CHR", "start":"START", "end":"END"}, axis=1).astype(int)
         df_concat = pd.concat([df_pos, df_cnv], axis=1)
         df_concat["CHR"] = df_concat["CHR"].map(lambda x: f"chr{x}")
