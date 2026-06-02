@@ -91,7 +91,7 @@ def run_scevan(path_target: Path,
                         perc_genes,
                         beta_vega):
             r = robjects.r
-            r.source("c_scevanR.R")
+            r.source(Path(__file__).parent / "c_scevanR.R")
             r.r_run_scevan(str(p), name_tag, n_cores, norm_cell_vector, n_genes_chr, perc_genes, beta_vega)
 
         run_rscript(p,
