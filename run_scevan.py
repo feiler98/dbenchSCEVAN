@@ -126,7 +126,7 @@ if __name__ == "__main__":
     # 0 for beta_vega not allowed (comparable to copykat's KS.cut)
     kwargs_gridsearch = {
         "n_cores": [30],
-        "n_genes_chr": [1, 5, 10, 100],
+        "n_genes_chr": [1, 5, 10, 25, 50],
         "perc_genes": [0, 5, 10, 20, 30],
         "beta_vega": [0.1, 0.5, 1, 2, 3, 4],
         "cell_pre_label": [True, False]
