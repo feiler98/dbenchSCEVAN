@@ -94,17 +94,17 @@ def run_scevan(path_target: Path,
             r.source(str(Path(__file__).parent / "c_scevanR.R"))
             r.r_run_scevan(str(p), name_tag, n_cores, norm_cell_vector, n_genes_chr, perc_genes, beta_vega)
 
-        run_rscript(p,
-                    name_tag,
-                    n_cores,
-                    norm_cell_vector,
-                    n_genes_chr,
-                    perc_genes,
-                    beta_vega)
-
-        # generate a csv-matrix for the CNA-output
-        path_cnv_rdata = [p for p in Path("./output").glob("*__scevan_CNAmtx.RData")][0]
         try:
+            run_rscript(p,
+                        name_tag,
+                        n_cores,
+                        norm_cell_vector,
+                        n_genes_chr,
+                        perc_genes,
+                        beta_vega)
+
+            # generate a csv-matrix for the CNA-output
+            path_cnv_rdata = [p for p in Path("./output").glob("*__scevan_CNAmtx.RData")][0]
             df_cnv = rdata.read_rds(path_cnv_rdata)["CNA_mtx_relat"].to_pandas()
             path_annot_rdata = [p for p in Path("./output").glob("*__scevan_count_mtx_annot.RData")][0]
             df_pos = rdata.read_rds(path_annot_rdata)['count_mtx_annot'].set_index("gene_name").drop("gene_id", axis=1).rename({"seqnames":"CHR", "start":"START", "end":"END"}, axis=1).astype(int)
