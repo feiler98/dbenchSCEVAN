@@ -75,7 +75,7 @@ def run_scevan(path_target: Path,
         path_out_target = path_out_data / name_tag
         path_out_target.mkdir(parents=True, exist_ok=True)
 
-        norm_cell_vector = ""
+        norm_cell_vector = robjects.NULL
         if cell_pre_label:
             path_desc = dict_paths_target_desc[f"{p.stem.split("__RCM")[0]}__describe"]
             df_desc = pd.read_csv(path_desc, index_col="cell_id")
